@@ -117,7 +117,24 @@ void *ThreadFunc(void *pArg) {
 
     count = 0;
 
-    for (int i = sp; i < ep; i++) {
+    //if 2 is within the threads range, add it first to ease incrementation
+    if (sp <= 2 && ep > 2) {
+        prime_array[count] = 2;
+        count++;
+    }
+
+    // determine where to strart incrementing
+    int start;
+    if (sp <= 3) {
+        start = 3;
+    } else if (sp % 2 == 0) {
+        start = sp + 1; // goes to next off if the starting point is even
+    } else {
+        start = sp; // already odd
+    }
+
+    // checks odd numbers only, increment by 2
+    for (int i = start; i < ep; i += 2) {
         if (prime(i)) {
             prime_array[count] = i;
             count++;
