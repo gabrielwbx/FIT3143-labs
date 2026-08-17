@@ -5,9 +5,15 @@
 
 int above_hundred;
 FILE *fp = NULL;
+int *prime_array;
+int prime_count = 0;
 
 //function prototype 
-int prime(int num); 
+int prime(int num);
+void WriteToFile(FILE *pArg); 
+void WriteToFile(FILE *pArg);
+int *prime_array;
+int prime_count = 0;
 
 // Main function (no counter)
 int main() {
@@ -42,12 +48,23 @@ int main() {
     if (n <= 2) {
         fprintf(fp, "No prime numbers found.\n");
     } else {
-        fprintf(fp, "2"); //just for 2
+        prime_array = malloc(n * sizeof(int));
+        
+        if (prime(2)) {
+            prime_array[prime_count++] = 2;
+        }
+        
         for (int i = 3; i < n; i += 2) { //skip even numbers, they divisible by 2 and not prime
             if (prime(i)) {
-                fprintf(fp, ", %d", i);
+                prime_array[prime_count++] = i;
             }
         }
+    }
+
+    WriteToFile(fp);
+
+    if (prime_count > 0) {
+        free(prime_array);
     }
 
     clock_gettime(CLOCK_MONOTONIC, &endComp);
@@ -134,6 +151,18 @@ int main() {
 //     return 0;
 // }
 
+void WriteToFile(FILE *pArg) {
+    int primes_per_line = 0;
+ 
+    for (int j = 0; j < prime_count; j++) {
+        if (primes_per_line > 0) {
+            fprintf(pArg, "%s", (primes_per_line % 25 == 0) ? ",\n" : ", ");
+        }
+        fprintf(pArg, "%d", prime_array[j]);
+        primes_per_line++;
+    }
+}
+
 int prime(int num)
 {
     if (num == 2) {
@@ -156,4 +185,16 @@ int prime(int num)
         }
     }
     return 1;
+}
+
+void WriteToFile(FILE *pArg) {
+    int primes_per_line = 0;
+ 
+    for (int j = 0; j < prime_count; j++) {
+        if (primes_per_line > 0) {
+            fprintf(pArg, "%s", (primes_per_line % 25 == 0) ? ",\n" : ", ");
+        }
+        fprintf(pArg, "%d", prime_array[j]);
+        primes_per_line++;
+    }
 }
