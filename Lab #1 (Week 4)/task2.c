@@ -59,26 +59,23 @@ int main() {
     printf("Start computation\n");
     clock_gettime(CLOCK_MONOTONIC, &startComp); 
 
-    if (n <= 2) {
-        fprintf(fp, "No prime numbers found.\n"); //only special case
-    } else {
-        pthread_t tid[NUM_THREADS];
-        int threadNum[NUM_THREADS];
 
-        //fork, the threads will now run in parralel
-        for (i = 0; i < NUM_THREADS; i++) {
-            threadNum[i] = i;
-            pthread_create(&tid[i], 0, ThreadFunc, &threadNum[i]);
-        }
+    pthread_t tid[NUM_THREADS];
+    int threadNum[NUM_THREADS];
 
-        //join
-        for(i = 0; i < NUM_THREADS; i++) {
-                pthread_join(tid[i], NULL);
-        }
-
-        WriteToFile(fp);
+    //fork, the threads will now run in parralel
+    for (i = 0; i < NUM_THREADS; i++) {
+        threadNum[i] = i;
+        pthread_create(&tid[i], 0, ThreadFunc, &threadNum[i]);
     }
 
+    //join
+    for(i = 0; i < NUM_THREADS; i++) {
+        pthread_join(tid[i], NULL);
+    }
+
+    WriteToFile(fp);
+    
     for (int t = 0; t < NUM_THREADS; t++) {
         if (results[t] != NULL) {
             free(results[t]);
@@ -97,7 +94,7 @@ int main() {
     }
 
     printf("\nEnd computation\n");
-    printf("\nTotal omputational time: %f seconds\n", time_taken);
+    printf("\nTotal computational time (inc writing): %f seconds\n", time_taken);
 
     return 0;
 }
@@ -128,24 +125,8 @@ void *ThreadFunc(void *pArg) {
 
     count = 0;
 
-    //if 2 is within the threads range, add it first to ease incrementation
-    if (sp <= 2 && ep > 2) {
-        prime_array[count] = 2;
-        count++;
-    }
-
-    // determine where to strart incrementing
-    int start;
-    if (sp <= 3) {
-        start = 3;
-    } else if (sp % 2 == 0) {
-        start = sp + 1; // goes to next off if the starting point is even
-    } else {
-        start = sp; // already odd
-    }
-
-    // checks odd numbers only, increment by 2
-    for (int i = start; i < ep; i += 2) {
+    // check all numbers in this thread's range
+    for (int i = sp; i < ep; i++) {
         if (prime(i)) {
             prime_array[count] = i;
             count++;
@@ -166,16 +147,8 @@ void *ThreadFunc(void *pArg) {
 
 int prime(int num)
 {
-    if (num == 2) {
-        return 1;
-    }
-
-    if (num < 2) {
+    if ((num < 2) || ((num % 2 == 0) && (num != 2))) { //if u divide 2 and theres no remainder it means its an even number and not prime
         return 0;
-    }
-
-    if (num % 2 == 0) {
-        return 0;  //if u divide 2 and theres no remainder it means its an even number and not prime
     }
 
     // only need to check divisors up to sqrt(num)

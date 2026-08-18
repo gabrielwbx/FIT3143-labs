@@ -24,7 +24,7 @@ void WriteToFile(FILE *pArg);
 
 int main() {
     int n;
-    double time_taken;
+    double total_time_taken, compute_time_taken;
     struct timespec startComp, endComp;
 
     printf("Enter number:\n");
@@ -51,21 +51,22 @@ int main() {
     printf("Start computation\n");
     clock_gettime(CLOCK_MONOTONIC, &startComp); 
 
-    if (n <= 2) {
-        fprintf(fp, "No prime numbers found.\n");
-    } else {
-        prime_array = malloc(n * sizeof(int)); //allocates memory for array of size n * 4 (integer bytes)
+    prime_array = malloc(n * sizeof(int)); //allocates memory for array of size n * 4 (integer bytes)
         
-        prime_array[prime_count] = 2;
-        prime_count++;
-        
-        for (int i = 3; i < n; i += 2) { //skip even numbers, they divisible by 2 and not prime
-            if (prime(i)) {
-                prime_array[prime_count] = i;
-                prime_count++;
-            }
+    for (int i = 2; i < n; i++) {
+        if (prime(i)) {
+            prime_array[prime_count] = i;
+            prime_count++;
         }
     }
+
+    clock_gettime(CLOCK_MONOTONIC, &endComp);
+    printf("\nEnd computation\n");
+
+    compute_time_taken = (endComp.tv_sec - startComp.tv_sec) * 1e9; 
+    compute_time_taken = (compute_time_taken + (endComp.tv_nsec - startComp.tv_nsec)) * 1e-9;
+
+    printf("\nComputational time: %f seconds\n", compute_time_taken);
 
     WriteToFile(fp);
 
@@ -77,32 +78,23 @@ int main() {
     clock_gettime(CLOCK_MONOTONIC, &endComp);
 
     //taken from lab week 3
-    time_taken = (endComp.tv_sec - startComp.tv_sec) * 1e9; 
-    time_taken = (time_taken + (endComp.tv_nsec - startComp.tv_nsec)) * 1e-9; 
+    total_time_taken = (endComp.tv_sec - startComp.tv_sec) * 1e9; 
+    total_time_taken = (total_time_taken + (endComp.tv_nsec - startComp.tv_nsec)) * 1e-9; 
 
     if (above_hundred == 1) {
         fclose(fp); 
         printf("Prime numbers written to prime_numbers.txt\n");
     }
 
-    printf("\nEnd computation\n");
-    printf("\nComputational time: %f seconds\n", time_taken);
+    printf("\nTotal Computational time (inc writing): %f seconds\n", total_time_taken);
 
     return 0;
 }
 
 int prime(int num)
-{
-    if (num == 2) {
-        return 1;
-    }
-
-    if (num < 2) {
+{   
+    if ((num < 2) || ((num % 2 == 0) && (num != 2))) { //if u divide 2 and theres no remainder it means its an even number and not prime
         return 0;
-    }
-
-    if (num % 2 == 0) {
-        return 0;  //if u divide 2 and theres no remainder it means its an even number and not prime
     }
 
     // only need to check divisors up to sqrt(num)
