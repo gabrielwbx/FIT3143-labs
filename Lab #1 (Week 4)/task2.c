@@ -1,3 +1,12 @@
+/*
+* task2.c
+* this task uses pthreads to create threads to compute prime numbers in parallel
+* How to run file:
+* 1. Open terminal for Lab #1 (Week 4) file directory
+* 2. Compile the file using 'gcc -o task2 task2.c -lpthread'
+* 3. Run the .exe using './task2'
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -9,6 +18,7 @@
 //
 #define NUM_THREADS 6 
 
+//global variables
 int n;
 int above_hundred;
 FILE *fp = NULL;
@@ -70,9 +80,9 @@ int main() {
     }
 
     for (int t = 0; t < NUM_THREADS; t++) {
-         if (results[t] != NULL) {
-             free(results[t]);
-         }
+        if (results[t] != NULL) {
+            free(results[t]);
+        }
     }
 
     clock_gettime(CLOCK_MONOTONIC, &endComp);
@@ -92,6 +102,7 @@ int main() {
     return 0;
 }
 
+//thread function for the threads to run parrelelly
 void *ThreadFunc(void *pArg) {
     int count;
     struct timespec t_start, t_end;
@@ -113,7 +124,7 @@ void *ThreadFunc(void *pArg) {
         ep += nptr; //last thread gets the remainder
     }
 
-    int *prime_array = malloc((ep - sp) * sizeof(int));
+    int *prime_array = malloc((ep - sp) * sizeof(int)); //allocates memory for each thread for its corresponding sizes
 
     count = 0;
 
@@ -141,8 +152,8 @@ void *ThreadFunc(void *pArg) {
         }
     }
 
-    results[my_rank] = prime_array;
-    prime_count[my_rank] = count;
+    results[my_rank] = prime_array; //store the threads array into their corresponding index of the global array
+    prime_count[my_rank] = count; //stores the count of elements in the threads array
 
     clock_gettime(CLOCK_MONOTONIC, &t_end);
 
@@ -166,7 +177,7 @@ int prime(int num)
     if (num % 2 == 0) {
         return 0;  //if u divide 2 and theres no remainder it means its an even number and not prime
     }
- 
+
     // only need to check divisors up to sqrt(num)
     int sqrt_num = (int)sqrt(num);
     for (int x = 3; x <= sqrt_num; x += 2) { //skip even numbers
@@ -177,13 +188,14 @@ int prime(int num)
     return 1;
 }
 
+//writing to file function, takes in a file pointer as an argument
 void WriteToFile(FILE *pArg) {
     int primes_per_line = 0;
- 
+
     for (int t = 0; t < NUM_THREADS; t++) {
         for (int j = 0; j < prime_count[t]; j++) {
             if (primes_per_line > 0) {
-                fprintf(pArg, "%s", (primes_per_line % 25 == 0) ? ",\n" : ", "); //intrroduced ternary operators so it doesnt looks too clustered
+                fprintf(pArg, "%s", (primes_per_line % 25 == 0) ? ",\n" : ", "); //ternary operators used for reducing clutter
             }
             fprintf(pArg, "%d", results[t][j]);
             primes_per_line++;
