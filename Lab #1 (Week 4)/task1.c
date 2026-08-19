@@ -1,4 +1,6 @@
 /*
+* Student 1: Gabriel Wong Bo Xuen 34496114 gwon0021@student.monash.edu
+* Student 2: Nicholas Ho Khor Pei 34496009 nhoo0025@student.monash.edu
 * task1.c
 * this file contains the serial implementation of the prime number getter up to input N
 * How to run file:
@@ -21,7 +23,7 @@ int prime_count = 0;
 
 //function prototypes
 int prime(int num);
-void WriteToFile(FILE *pArg); 
+void WriteToFile(char *pFilename); 
 
 int main() {
     int n;
@@ -36,17 +38,6 @@ int main() {
         above_hundred = 1; //c dont allow boolean unless library, 0 is false and any non-zero is true
     } else {
         above_hundred = 0;
-    }
-
-    if (above_hundred == 1) {   
-        fp = fopen("prime_numbers.txt", "w"); //open file for writing, if doesnt exist it will be created 
-
-        if (fp == NULL) {
-            printf("Error: Unable to open prime numbers file.\n");
-            return 1;
-        }
-    } else {
-        fp = stdout; //if not above 100, write to terimnal
     }
 
     printf("Start computation\n");
@@ -69,7 +60,12 @@ int main() {
 
     printf("\nComputational time: %f seconds\n", compute_time_taken);
 
-    WriteToFile(fp);
+    if (above_hundred == 1) {
+        WriteToFile("prime_numberst1.txt"); 
+        printf("Prime numbers written to prime_numbers1.txt\n");
+    } else {
+        WriteToFile(NULL);
+    }
 
     //free the array for memory
     if (prime_count > 0) {
@@ -81,11 +77,6 @@ int main() {
     //taken from lab week 3
     total_time_taken = (endComp.tv_sec - startComp.tv_sec) * 1e9; 
     total_time_taken = (total_time_taken + (endComp.tv_nsec - startComp.tv_nsec)) * 1e-9; 
-
-    if (above_hundred == 1) {
-        fclose(fp); 
-        printf("Prime numbers written to prime_numbers.txt\n");
-    }
 
     printf("\nTotal Computational time (inc writing): %f seconds\n", total_time_taken);
 
@@ -109,14 +100,28 @@ int prime(int num)
 }
 
 //writing to file function, takes in a file pointer as an argument
-void WriteToFile(FILE *pArg) {
-    int primes_per_line = 0;
+void WriteToFile(char *pFilename) {
+    if (prime_count == 0) {
+        return;
+    }
 
-    for (int j = 0; j < prime_count; j++) {
-        if (primes_per_line > 0) {
-            fprintf(pArg, "%s", (primes_per_line % 25 == 0) ? ",\n" : ", "); //ternary operators used for reducing clutter
+    FILE *pFile = stdout;
+    if (pFilename != NULL) {
+        pFile = fopen(pFilename, "w");
+        if (pFile == NULL) {
+            printf("Error opening file.\n");
+            return;
         }
-        fprintf(pArg, "%d", prime_array[j]);
-        primes_per_line++;
+    }
+
+    for (int i = 0; i < prime_count; i++) {
+        fprintf(pFile, "%d", prime_array[i]);
+        if (i < prime_count - 1) {
+            fprintf(pFile, "%s", ((i + 1) % 25 == 0) ? ",\n" : ", ");//ternary operators to reduce if statements for visibility
+        }
+    }
+
+    if (pFilename != NULL) {
+        fclose(pFile);
     }
 }

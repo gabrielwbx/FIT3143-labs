@@ -1,4 +1,6 @@
 /*
+* Student 1: Gabriel Wong Bo Xuen 34496114 gwon0021@student.monash.edu
+* Student 2: Nicholas Ho Khor Pei 34496009 nhoo0025@student.monash.edu
 * task2.c
 * this task uses pthreads to create threads to compute prime numbers in parallel
 * How to run file:
@@ -28,7 +30,7 @@ int prime_count[NUM_THREADS];
 //function prototypes
 int prime(int num);
 void *ThreadFunc(void *pArg);
-void WriteToFile(FILE *pArg);
+void WriteToFile(char *pFilename);
 
 int main() {
     int i;
@@ -43,17 +45,6 @@ int main() {
         above_hundred = 1; //c dont allow boolean unless library, 0 is false and any non-zero is true
     } else {
         above_hundred = 0;
-    }
-
-    if (above_hundred == 1) {   
-        fp = fopen("prime_numberst2.txt", "w"); //open file for writing, if doesnt exist it will be created 
-
-        if (fp == NULL) {
-            printf("Error: Unable to open prime numbers file.\n");
-            return 1;
-        }
-    } else {
-        fp = stdout; //if not above 100, write to terimnal
     }
 
     printf("Start computation\n");
@@ -73,8 +64,13 @@ int main() {
     for(i = 0; i < NUM_THREADS; i++) {
         pthread_join(tid[i], NULL);
     }
-
-    WriteToFile(fp);
+    
+    if (above_hundred == 1) {
+        WriteToFile("prime_numberst2.txt"); 
+        printf("Prime numbers written to file prime_numbers2.txt\n");
+    } else {
+        WriteToFile(NULL);
+    }
     
     for (int t = 0; t < NUM_THREADS; t++) {
         if (results[t] != NULL) {
@@ -87,11 +83,6 @@ int main() {
     //taken from lab week 3
     time_taken = (endComp.tv_sec - startComp.tv_sec) * 1e9; 
     time_taken = (time_taken + (endComp.tv_nsec - startComp.tv_nsec)) * 1e-9; 
-
-    if (above_hundred == 1) {
-        fclose(fp); 
-        printf("Prime numbers written to prime_numberst2.txt\n");
-    }
 
     printf("\nEnd computation\n");
     printf("\nTotal computational time (inc writing): %f seconds\n", time_taken);
@@ -162,16 +153,38 @@ int prime(int num)
 }
 
 //writing to file function, takes in a file pointer as an argument
-void WriteToFile(FILE *pArg) {
-    int primes_per_line = 0;
+void WriteToFile(char *pFilename) {
+    int total = 0;
 
     for (int t = 0; t < NUM_THREADS; t++) {
-        for (int j = 0; j < prime_count[t]; j++) {
-            if (primes_per_line > 0) {
-                fprintf(pArg, "%s", (primes_per_line % 25 == 0) ? ",\n" : ", "); //ternary operators used for reducing clutter
-            }
-            fprintf(pArg, "%d", results[t][j]);
-            primes_per_line++;
+        total += prime_count[t];
+    }
+
+    if (total == 0) {
+        return;
+    }
+
+    FILE *pFile = stdout;
+    if (pFilename != NULL) {
+        pFile = fopen(pFilename, "w");
+        if (pFile == NULL) {
+            printf("Error opening file.\n");
+            return;
         }
+    }
+
+    int count = 0;
+    for (int t = 0; t < NUM_THREADS; t++) {
+        for (int j = 0; j < prime_count[t]; j++) {
+            count++;
+            fprintf(pFile, "%d", results[t][j]);
+            if (count < total) {
+                fprintf(pFile, "%s", (count % 25 == 0) ? ",\n" : ", ");//ternary operators to reduce if statements for visibility
+            }
+        }
+    }
+
+    if (pFilename != NULL) {
+        fclose(pFile);
     }
 }
