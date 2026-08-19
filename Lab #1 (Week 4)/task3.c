@@ -3,7 +3,7 @@
 * this task uses OpenMP to create threads to compute prime numbers in parallel
 * How to run file:
 * 1. Open terminal for Lab #1 (Week 4) file directory
-* 2. Compile the file using 'gcc -o a task3.c -fopenmp'
+* 2. Compile the file using 'gcc task3.c -o a -fopenmp'
 * 3. Run the .exe using './a'
 */
 

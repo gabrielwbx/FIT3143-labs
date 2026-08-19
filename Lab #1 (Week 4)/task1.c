@@ -1,8 +1,9 @@
 /*
 * task1.c
+* this file contains the serial implementation of the prime number getter up to input N
 * How to run file:
 * 1. Open terminal for Lab #1 (Week 4) file directory
-* 2. Compile the file using 'gcc -o a task1.c'
+* 2. Compile the file using 'gcc task1.c -o a'
 * 3. Run the .exe using './a'
 */
 

@@ -3,7 +3,7 @@
 * this task uses pthreads to create threads to compute prime numbers in parallel
 * How to run file:
 * 1. Open terminal for Lab #1 (Week 4) file directory
-* 2. Compile the file using 'gcc -o a task2.c -lpthread'
+* 2. Compile the file using 'gcc task2.c -o a -pthread'
 * 3. Run the .exe using './a'
 */
 
