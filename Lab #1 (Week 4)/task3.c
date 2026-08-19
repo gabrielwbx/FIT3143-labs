@@ -3,8 +3,8 @@
 * this task uses OpenMP to create threads to compute prime numbers in parallel
 * How to run file:
 * 1. Open terminal for Lab #1 (Week 4) file directory
-* 2. Compile the file using 'gcc -o task3 task3.c -fopenmp'
-* 3. Run the .exe using './task3'
+* 2. Compile the file using 'gcc -o a task3.c -fopenmp'
+* 3. Run the .exe using './a'
 */
 
 #include <stdio.h>
@@ -63,33 +63,22 @@ int main() {
         prime_count[i] = 0;
     }
 
-    //parralel region starts here
+    //parallel region
     #pragma omp parallel num_threads(NUM_THREADS) 
     {
-
         int my_rank = omp_get_thread_num();
         int count = 0;
         struct timespec t_start, t_end;
         double thread_time;
 
         clock_gettime(CLOCK_MONOTONIC, &t_start);
-
         printf("Thread %d created\n", my_rank);
 
-        // Calculate range for this thread
-        int npt = n / omp_get_num_threads(); // npt = numbers per thread
-        int nptr = n % omp_get_num_threads(); // nptr = numbers per thread remainder
+        int *prime_array = malloc(n * sizeof(int));
 
-        int sp = my_rank * npt; // start point
-        int ep = sp + npt;      // end point
-
-        if (my_rank == omp_get_num_threads() - 1) {
-            ep += nptr; //last thread gets the remainder
-        }
-
-        int *prime_array = malloc((ep - sp) * sizeof(int));
-
-        for (int i = sp; i < ep; i++) {
+        //dyanmic worlkoad balance, much better than static, as some threads will idle after
+        #pragma omp for schedule(guided)
+        for (int i = 2; i < n; i++) {
             if (prime(i)) {
                 prime_array[count] = i;
                 count++;
@@ -104,11 +93,11 @@ int main() {
         thread_time = (t_end.tv_sec - t_start.tv_sec) * 1e9; 
         thread_time = (thread_time + (t_end.tv_nsec - t_start.tv_nsec)) * 1e-9; 
         printf("Thread %d finished. Computational time: %fs\n", my_rank, thread_time);
-    } //exit parralel region
+    } //exit parallel region
 
     WriteToFile(fp);
 
-    // Free allocated memory
+    //free allocated memory
     for (int t = 0; t < NUM_THREADS; t++) {
         if (results[t] != NULL) {
             free(results[t]);

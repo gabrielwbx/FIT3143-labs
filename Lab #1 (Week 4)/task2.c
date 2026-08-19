@@ -3,8 +3,8 @@
 * this task uses pthreads to create threads to compute prime numbers in parallel
 * How to run file:
 * 1. Open terminal for Lab #1 (Week 4) file directory
-* 2. Compile the file using 'gcc -o task2 task2.c -lpthread'
-* 3. Run the .exe using './task2'
+* 2. Compile the file using 'gcc -o a task2.c -lpthread'
+* 3. Run the .exe using './a'
 */
 
 #include <stdio.h>
@@ -125,7 +125,7 @@ void *ThreadFunc(void *pArg) {
 
     count = 0;
 
-    // check all numbers in this thread's range
+    //check all numbers in this thread's range
     for (int i = sp; i < ep; i++) {
         if (prime(i)) {
             prime_array[count] = i;

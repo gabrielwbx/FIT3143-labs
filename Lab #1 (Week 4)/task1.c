@@ -2,8 +2,8 @@
 * task1.c
 * How to run file:
 * 1. Open terminal for Lab #1 (Week 4) file directory
-* 2. Compile the file using 'gcc -o task1 task1.c'
-* 3. Run the .exe using './task1'
+* 2. Compile the file using 'gcc -o a task1.c'
+* 3. Run the .exe using './a'
 */
 
 
