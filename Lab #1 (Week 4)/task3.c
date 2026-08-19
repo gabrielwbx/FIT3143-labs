@@ -7,6 +7,12 @@
 * 1. Open terminal for Lab #1 (Week 4) file directory
 * 2. Compile the file using 'gcc task3.c -o a -fopenmp'
 * 3. Run the .exe using './a'
+*
+* AI DECLARATION:
+* I used AI https://gemini.google.com/ to learn about the qsort() function in the stdlib.h library
+* and how it could be applied to several types of arrays. I used it to learn about the parameters it
+* accepts as well as the comparison function, which i used in my code for the qsort() function.
+* I integrated the overall structure as well as the logic into my task3's WriteToFile function.
 */
 
 #include <stdio.h>
